@@ -22,6 +22,18 @@
 		$this->db->from('project_details');
 		$this->db->join('projects', 'projects.project_id = project_details.project_id', 'left outer');
 		$this->db->where('project_details.project_id', $slug_url);
+		$this->db->order_by('sort_order', 'ASC');
+		
+		$query = $this->db->get();
+		return $query->result();
+	}
+	
+	function inventory_milestone_plan_list($slug_url)
+	{
+		$this->db->select('project_details.*, projects.milestone_status');
+		$this->db->from('project_details');
+		$this->db->join('projects', 'projects.project_id = project_details.project_id', 'left outer');
+		$this->db->where('project_details.project_id', $slug_url);
 		$this->db->where('projects.milestone_status', 'Posted');
 		$this->db->order_by('sort_order', 'ASC');
 		

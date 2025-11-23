@@ -24,23 +24,25 @@ class Pdf extends CI_Controller {
 
 		$booking_id = $this->input->get('booking_id');
 		$inventory_id = $this->input->get('inventory_id');
-		
-		$record_list = $this->booking->booking_detail_list($booking_id);
-		// $data['paid_amount_list'] = $this->booking->booking_paid_installment_list($booking_id);
-		$installment_list = $this->booking->inventory_installment_list($inventory_id);
-		$first_installment_amount = $installment_list[0]->amount;
-		// $data['duesurcharge_list'] = $this->booking->booking_duesurcharge_list($booking_id);
-		// $data['duesurcharge_waive_off'] = $this->booking->booking_duesurcharge_waive_off($booking_id);
-		
-		// $filename = $data['record_list']->customer_name."-".$data['record_list']->unit_number."-".date('d-M-Y-g-i');
-		//$html = $this->load->view('pdf/account_statement', $data, true);
 
+		$record_list = $this->booking->booking_detail_list($booking_id);
 		$challan_list = $this->booking->booking_challan_list($booking_id);
-		$installment_list = $this->booking->inventory_installment_list($inventory_id);
 		$total_unit_price = $this->inventory->total_unit_price($inventory_id);
 
+		if($record_list->plan_type == 'Installment')
+		{
+			$installment_list = $this->booking->inventory_installment_list($inventory_id);
+			$statement_data = generate_statement_data($installment_list, $challan_list, $total_unit_price);
+		}
+		else
+		{
+			$installment_list = $this->booking->inventory_milestone_installment_list($inventory_id);
+			$statement_data = generate_milestone_statement_data($installment_list, $challan_list, $total_unit_price);
+		}
+
+		$first_installment_amount = $installment_list[0]->amount;
+
 		$filename = $record_list->customer_name."-".$record_list->unit_number."-".date('d-M-Y-g-i');
-		$statement_data = generate_statement_data($installment_list, $challan_list, $total_unit_price);
 		$data = [
 			'record_list' => $record_list,
 			'challan_list' => $challan_list,

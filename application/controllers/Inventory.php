@@ -184,8 +184,8 @@ class Inventory extends CI_Controller {
 			return;
 		}
 		
-		if($form_data["plan_type"] == 'Installment')
-		{
+		//if($form_data["plan_type"] == 'Installment')
+		//{
 			$check_unit_validation = $this->crud->check_unit_validation($project_id, $unit_number, $db_table, $inventory_main_id);
 			$check_floor_unit_validation = $this->crud->check_floor_validation($project_id, $floor_block, $unit_number, $db_table, $inventory_main_id);
 			if ( !empty($check_unit_validation) AND !empty($check_floor_unit_validation) )
@@ -193,7 +193,7 @@ class Inventory extends CI_Controller {
 				out('ERROR', '<p>Record already exists.</p>');
 				return false;
 			}
-		}
+		//}
 		
 		$message = '';
 		$data = array(
@@ -402,7 +402,7 @@ class Inventory extends CI_Controller {
 
 	public function get_milestones($inventory_id = 0)
 	{
-		$milestones = $this->project->milestone_plan_list($inventory_id);
+		$milestones = $this->project->inventory_milestone_plan_list($inventory_id);
 		echo json_encode($milestones);
 	}
 	

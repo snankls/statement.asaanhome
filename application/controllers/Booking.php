@@ -495,8 +495,7 @@ class Booking extends CI_Controller {
 			$statement_data = generate_milestone_statement_data($installment_list, $challan_list, $total_unit_price);
 		}
 		
-		
-		//pre_print($statement_data);
+		//pre_print($installment_list);
 
 		$data = [
 			'record_list' => $record_list,

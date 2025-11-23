@@ -1,4 +1,5 @@
-<?php $total_duesurcharge_amount = 0;
+<?php //pre_print($statement_rows);
+$total_duesurcharge_amount = 0;
 foreach ($duesurcharge_list as $data) {
     $total_duesurcharge_amount += $data->amount;
 } ?>

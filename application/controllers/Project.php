@@ -200,7 +200,7 @@ class Project extends CI_Controller {
 							'milestone_name' => isset($milestone[$index]) ? $milestone[$index] : '',
 							'sort_order' => isset($form_data["sort_order"][$index]) ? $form_data["sort_order"][$index] : 0,
 							'achievement' => isset($form_data["achievement"][$index]) ? $form_data["achievement"][$index] : 0,
-							'achievement_date' => date('Y-m-d'),
+							'achievement_date' => ($form_data["achievement"][$index] == 1) ? date('Y-m-d') : '0000-00-00',
 							'created_by_id' => $created_by_id,
 							'created_on' => time(),
 						);
@@ -327,7 +327,10 @@ class Project extends CI_Controller {
 		);
 		$this->crud->update($data, $posted_id, 'projects', 'project_id');
 
-		out('SUCCESS', 'Removed.');
+		out_json( array(
+			'SUCCESS' => 'Record posted succesfully.',
+			'RedirectTo' => site_url('project'),
+		));
 	}
 
 	public function get_view_actions($permission_for = 'project')

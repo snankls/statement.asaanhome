@@ -166,13 +166,17 @@ $(".add-row").on('click', function() {
 //     $('#project-details').append(new_row);
 // });
 
-//Milestone Posted
+// Milestone Posted
 function milestone_posted(id) {
-    var o = new Object();
-	o.posted_id = id;
+    var o = {};
+    o.posted_id = id;
 
     if (confirm("Do you want to posted it permanently. it cannot be undo?")) {
-        $.post(site_url + '/project/milestone_posted/', o);
+        $.post(site_url + '/project/milestone_posted/', o, function(res) {
+            if (res.RedirectTo) {
+                window.location.href = res.RedirectTo;
+            }
+        }, 'json');
     }
 }
 
