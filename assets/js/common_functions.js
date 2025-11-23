@@ -2715,6 +2715,8 @@ var CommonFunctions = function () {
 			if ($(e).closest('tr').length)
 				container = $(e).closest('tr')[0];
 
+			$(container).find('select[name="plan_type"]').val('');
+
 			if (typeof selected === 'undefined')
 				selected = $(e).attr('data-selected');
 

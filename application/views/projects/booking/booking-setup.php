@@ -152,7 +152,7 @@ $slug_url = $this->uri->segment($last); ?>
                                 </div>
                                 <div class="form-group col-lg-3 col-xs-12">
                                 	<label class="col-form-label">Agency Commission <span class="error-message">*</span></label>
-                                    <input type="text" name="agency_commission" class="form-control" value="<?php echo @$record->agency_commission; ?>">
+                                    <input type="number" name="agency_commission" class="form-control" value="<?php echo @$record->agency_commission; ?>">
                                 </div>
                                 
                                  <?php if ($slug_url == 'add') { ?>
@@ -162,8 +162,8 @@ $slug_url = $this->uri->segment($last); ?>
                                     <input type="text" class="form-control datepicker" name="amount_date">
                                 </div>
                                 <div class="form-group col-lg-3 col-xs-12">
-                                    <label class="col-form-label">Booking Amount</label>
-                                    <input type="text" class="form-control required" name="amount">
+                                    <label class="col-form-label">Booking Amount <span class="error-message">*</span></label>
+                                    <input type="number" class="form-control required" name="amount">
                                 </div>
                                 <div class="form-group col-lg-3 col-xs-12">
                                     <label class="col-form-label">Payment Method</label>

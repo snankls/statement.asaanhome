@@ -188,7 +188,6 @@ class Inventory extends CI_Controller {
 		{
 			$check_unit_validation = $this->crud->check_unit_validation($project_id, $unit_number, $db_table, $inventory_main_id);
 			$check_floor_unit_validation = $this->crud->check_floor_validation($project_id, $floor_block, $unit_number, $db_table, $inventory_main_id);
-			//pre_print($check_floor_unit_validation);
 			if ( !empty($check_unit_validation) AND !empty($check_floor_unit_validation) )
 			{
 				out('ERROR', '<p>Record already exists.</p>');

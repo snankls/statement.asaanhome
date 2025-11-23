@@ -48,6 +48,10 @@
 												<td><?php echo area_unit($record_list->area_unit); ?></td>
 											</tr>
 											<tr>
+												<td><strong>Milestone Status</strong></td>
+												<td><?php echo $record_list->milestone_status; ?></td>
+											</tr>
+											<tr>
 												<td><strong>City</strong></td>
 												<td><?php echo $record_list->project_city; ?></td>
 											</tr>
@@ -86,7 +90,7 @@
 											<tr>
 												<td><?php echo $i; ?></td>
 												<td><?php echo $data->milestone_name; ?></td>
-												<td class="text-center"><?php if($data->achievement) echo '<i class="fas fa-check"></i> '.date_only($data->achievement_date); else echo 'N/A'; ?></td>
+												<td class="text-center"><?php if($data->achievement) echo '<i class="fas fa-check"></i> '.$data->achievement_date; else echo 'N/A'; ?></td>
 											</tr>
 											<?php $i++; } ?>
 										</tbody>

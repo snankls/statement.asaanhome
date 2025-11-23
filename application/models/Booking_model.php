@@ -85,6 +85,22 @@
 		return array();
 	}
 	
+    function inventory_milestone_installment_list($slug_url)
+	{
+		$this->db->select('inventory_milestones.*, project_details.milestone_name, project_details.achievement, project_details.achievement_date');
+		$this->db->from('inventory_milestones');
+		$this->db->join('projects', 'projects.project_id = inventory_milestones.project_milestone_id');
+		$this->db->join('project_details', 'project_details.project_id = projects.project_id');
+		$this->db->where('inventory_milestones.inventory_id', $slug_url);
+		
+		$query = $this->db->get();
+		if($query->num_rows()>0)
+		{
+			return $query->result();
+		}
+		return array();
+	}
+	
 	function total_paid_amount($booking_id)
 	{
 		$this->db->select('inventory_id, SUM(amount) as paid_amount');
@@ -100,6 +116,20 @@
 		$this->db->select('amount');
 		$this->db->from('inventory_installments');
 		$this->db->where('inventory_installments.inventory_id', $slug_url);
+		
+		$query = $this->db->get();
+		if($query->num_rows()>0)
+		{
+			return $query->result();
+		}
+		return array();
+	}
+	
+    function paid_inventory_milestone_installment_list($slug_url)
+	{
+		$this->db->select('amount');
+		$this->db->from('inventory_milestones');
+		$this->db->where('inventory_milestones.inventory_id', $slug_url);
 		
 		$query = $this->db->get();
 		if($query->num_rows()>0)

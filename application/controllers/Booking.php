@@ -482,11 +482,21 @@ class Booking extends CI_Controller {
 		$inventory_id = isset($record_list->inventory_inventory_id) ? $record_list->inventory_inventory_id : null;
 
 		$challan_list = $this->booking->booking_challan_list($slug_url);
-		$installment_list = $this->booking->inventory_installment_list($inventory_id);
-		$total_unit_price = $this->inventory->total_unit_price($inventory_id);
 
-		// ✅ Use generate_statement_data with full arguments
-		$statement_data = generate_statement_data($installment_list, $challan_list, $total_unit_price);
+		$total_unit_price = $this->inventory->total_unit_price($inventory_id);
+		if($record_list->plan_type == 'Installment')
+		{
+			$installment_list = $this->booking->inventory_installment_list($inventory_id);
+			$statement_data = generate_statement_data($installment_list, $challan_list, $total_unit_price);
+		}
+		else
+		{
+			$installment_list = $this->booking->inventory_milestone_installment_list($inventory_id);
+			$statement_data = generate_milestone_statement_data($installment_list, $challan_list, $total_unit_price);
+		}
+		
+		
+		//pre_print($statement_data);
 
 		$data = [
 			'record_list' => $record_list,
@@ -548,6 +558,7 @@ class Booking extends CI_Controller {
 		
 		$created_by_id = $this->session->userdata('user_id');
 		$update_id = $_POST['update_id'];
+		$plan_type = $_POST['plan_type'];
 		$inventory_id = $_POST['inventory_id'];
 		$amount_date = $_POST['amount_date'];
 		$amount = $_POST['amount'];
@@ -604,9 +615,19 @@ class Booking extends CI_Controller {
 		$total_payable_amount = $_POST['amount'];
 		$total_paid_amount = $this->booking->total_paid_amount($_POST["update_id"]);
 		$total_paid_amount = $total_paid_amount->paid_amount ? $total_paid_amount->paid_amount : 0;
-		$total_installment = $this->booking->paid_inventory_installment_list($_POST['inventory_id']);
-		$total_unit_price = $this->inventory->total_unit_price($_POST['inventory_id']);
 		
+		
+		if($plan_type == 'Installment')
+		{
+			$total_installment = $this->booking->paid_inventory_installment_list($_POST['inventory_id']);
+		}
+		else
+		{
+			$total_installment = $this->booking->paid_inventory_milestone_installment_list($_POST['inventory_id']);
+		}
+		//pre_print($total_installment);
+		
+		$total_unit_price = $this->inventory->total_unit_price($_POST['inventory_id']);
 		$total_paid_installment_till = $total_paid_amount + $total_payable_amount;
 		if($total_paid_installment_till > $total_unit_price)
 		{

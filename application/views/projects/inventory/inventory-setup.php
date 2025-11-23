@@ -9,7 +9,7 @@ $slug_url = $this->uri->segment($last); ?>
                 	<div id="purchase-list">
                     	<form id="update-form" class="form-horizontal disabled-field Form" role="form" action="<?php echo site_url('inventory/inventory_setup_post/'.@$record->inventory_id); ?>">
                         	<input type="hidden" name="last_uri" value="inventory" />
-                        	<input type="text" name="inventory_main_id" class="inventory_id" value="<?php echo @$record->inventory_id; ?>" />
+                        	<input type="hidden" name="inventory_main_id" class="inventory_id" value="<?php echo @$record->inventory_id; ?>" />
                         	<div class="form-row">
                             	<div class="form-group col-lg-3 col-xs-12">
                                 	<label class="col-form-label">Select Project <span class="error-message">*</span></label>
@@ -164,6 +164,14 @@ function togglePlanFields() {
     var projectId = $('[name=project_id]').val();
     var planType = $('[name=plan_type]').val();
 
+    // If plan type is empty, hide everything
+    if (!planType) {
+        $('.show-installment').hide();
+        $('[name=payment_plan]').prop('disabled', true).val('');
+        $('#installment-list').html('');
+        return; // Stop further execution
+    }
+
     if (planType === 'Installment') {
         $('.show-installment').show();
         $('[name=payment_plan]').prop('disabled', false);
@@ -171,11 +179,13 @@ function togglePlanFields() {
     } else if (planType === 'Milestone') {
         $('.show-installment').hide();
         $('[name=payment_plan]').prop('disabled', true);
+        $('#installment-list').html('');
 
         if(projectId == '')
         {
             alert('Please select Project first.');
             $('[name=plan_type]').val('');
+            $('#installment-list').html('');
             return false;
         }
 
@@ -554,5 +564,20 @@ $(document).ready(function(e) {
     calculateTotalEdit();
     
     $('.project-dropdown').trigger('change');
+});
+
+$(document).ready(function() {
+    // When project changes, reset plan type and clear installment/milestone table
+    $('[name=project_id]').on('change', function() {
+        // Reset plan type
+        $('[name=plan_type]').val('');
+
+        // Hide payment plan section
+        $('.show-installment').hide();
+        $('[name=payment_plan]').prop('disabled', true).val('');
+
+        // Clear milestone/installment list
+        $('#installment-list').html('');
+    });
 });
 </script>

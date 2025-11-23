@@ -399,6 +399,7 @@ foreach ($duesurcharge_list as $data) {
 				<form id="installment-form" class="form-horizontal Form" role="form" enctype="multipart/form-data">
 					<input type="hidden" name="update_id" value="<?php echo $record_list->booking_id; ?>">
 					<input type="hidden" name="inventory_id" value="<?php echo $record_list->inventory_inventory_id; ?>">
+					<input type="hidden" name="plan_type" value="<?php echo $record_list->plan_type; ?>">
 					<div class="form-group">
 						<label class="col-form-label">Date</label>
 						<input type="text" class="form-control datepicker required" name="amount_date">

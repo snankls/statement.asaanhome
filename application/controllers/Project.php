@@ -131,7 +131,7 @@ class Project extends CI_Controller {
 		
 			if (!$this->upload->do_upload('project_image')) {
 				$error = $this->upload->display_errors();
-				out('ERROR', $error); // Display the specific error message
+				out('ERROR', $error);
 				return;
 			} else {
 				$data = $this->upload->data();
@@ -148,7 +148,7 @@ class Project extends CI_Controller {
 		
 					if (!$this->image_lib->resize()) {
 						$error = $this->image_lib->display_errors();
-						out('ERROR', $error); // Display the specific error message
+						out('ERROR', $error);
 						return;
 					}
 		
@@ -200,7 +200,7 @@ class Project extends CI_Controller {
 							'milestone_name' => isset($milestone[$index]) ? $milestone[$index] : '',
 							'sort_order' => isset($form_data["sort_order"][$index]) ? $form_data["sort_order"][$index] : 0,
 							'achievement' => isset($form_data["achievement"][$index]) ? $form_data["achievement"][$index] : 0,
-							'achievement_date' => isset($form_data["achievement"][$index]) ? time() : '',
+							'achievement_date' => date('Y-m-d'),
 							'created_by_id' => $created_by_id,
 							'created_on' => time(),
 						);
@@ -233,7 +233,7 @@ class Project extends CI_Controller {
 				{
 					// Get achievement value for this index
 					$achievement_value = isset($form_data["achievement"][$index]) ? intval($form_data["achievement"][$index]) : 0;
-					$achievement_date = ($achievement_value == 1) ? time() : null;
+					$achievement_date = ($achievement_value == 1) ? date('Y-m-d') : '0000-00-00';
 					
 					// Check if this is an existing record (has project_detail_id)
 					$existing_id = isset($project_detail_id[$index]) && !empty($project_detail_id[$index]) ? $project_detail_id[$index] : null;
@@ -288,7 +288,6 @@ class Project extends CI_Controller {
 		
 		$data['record_list'] = $this->project->project_detail_list($slug_url);
 		$data['milestone_plan'] = $this->project->milestone_plan_list($slug_url);
-		//pre_print($data['milestone_plan']);
 		$data['title'] = "Project View";
 		$data['page'] = "projects/project/project-view";
 
@@ -311,6 +310,22 @@ class Project extends CI_Controller {
 
 		// Call model to delete (or soft delete)
 		$this->project->project_details_delete($delete_ids);
+
+		out('SUCCESS', 'Removed.');
+	}
+
+	public function milestone_posted()
+	{
+		check_login();
+		check_viewer_login();
+		restrict_role(CRM_ROLE);
+		
+		$posted_id = request_var('posted_id', '');
+
+		$data = array(
+			'milestone_status' => 'Posted',
+		);
+		$this->crud->update($data, $posted_id, 'projects', 'project_id');
 
 		out('SUCCESS', 'Removed.');
 	}

@@ -62,7 +62,7 @@ $slug_url = $this->uri->segment($last); ?>
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th width="40">&nbsp;</th>
-                                                <th width="40"><input class='check_all' type='checkbox' onclick="select_all()"/></th>
+                                                <?php if (@$record->milestone_status != "Posted"): ?><th width="40"><input class='check_all' type='checkbox' onclick="select_all()"/></th><?php endif; ?>
                                                 <th>Milestone Name</th>
                                                 <th width="120" class="text-center">Achievement</th>
                                             </tr>
@@ -70,13 +70,16 @@ $slug_url = $this->uri->segment($last); ?>
                                         <tbody id="project-details">
     
                                             <?php foreach($project_details as $project): ?>
-                                                <?php $this->load->view("projects/project/snippets/project-details.php", array('data' => $project)); ?>
+                                                <?php $this->load->view("projects/project/snippets/project-details.php", array('data' => $project, 'projects' => $record)); ?>
                                             <?php endforeach; ?>
     
                                         </tbody>
                                     </table>
+
+                                    <?php if(@$record->milestone_status != 'Posted') { ?>
                                     <a href="javascript:;" class="btn btn-success add-row">Add</a> &nbsp;
                                     <a href="javascript:;" class="btn btn-danger" onclick="delete_row();">Delete</a><br><br>
+                                    <?php } ?>
                                 </div>
                             </div>
                                 
@@ -84,8 +87,8 @@ $slug_url = $this->uri->segment($last); ?>
                                 <div class="form-group col-12">
                                     <button type="submit" class="btn btn-custom waves-effect waves-light form-submit-button">Save & Exit</button> &nbsp;
 
-                                    <?php if($current_role_id == 1) { ?>
-                                    <button type="submit" class="btn btn-dark waves-effect waves-light form-submit-button" onclick="milestone_posted();">Milestone Posted</button>
+                                    <?php if($current_role_id == 1 && @$record->milestone_status != 'Posted') { ?>
+                                    <button type="button" class="btn btn-dark waves-effect waves-light form-submit-button" onclick="milestone_posted('<?php echo @$record->project_id; ?>');">Milestone Posted</button>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -163,20 +166,14 @@ $(".add-row").on('click', function() {
 //     $('#project-details').append(new_row);
 // });
 
-//Delete More Row
-function milestone_posted() {
-    if (confirm("Do you want to posted it permanently it cannot be undo?")) {
-        $.post(site_url + '/project/milestone_posted/', 
-            function(result) {
-                if (result.msg === "SUCCESS") {
-                    $('.project-case:checkbox:checked').parents("tr").remove();
-                } else {
-                    alert(result.details);
-                }
-            }, 
-        "json");
+//Milestone Posted
+function milestone_posted(id) {
+    var o = new Object();
+	o.posted_id = id;
+
+    if (confirm("Do you want to posted it permanently. it cannot be undo?")) {
+        $.post(site_url + '/project/milestone_posted/', o);
     }
-    return false;
 }
 
 //Delete More Row
