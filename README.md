@@ -1,6 +1,7 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Property Installment Management System
+A CodeIgniter-based web application for managing property installment plans, payments, and customer accounts.
 
 ### What is this repository for? ###
 
