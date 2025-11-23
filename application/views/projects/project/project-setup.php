@@ -62,9 +62,9 @@ $slug_url = $this->uri->segment($last); ?>
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th width="40">&nbsp;</th>
-                                                <?php if (@$record->milestone_status != "Posted"): ?><th width="40"><input class='check_all' type='checkbox' onclick="select_all()"/></th><?php endif; ?>
+                                                <?php if (@$record->milestone_status != "Posted") { ?><th width="40"><input class='check_all' type='checkbox' onclick="select_all()"/></th><?php } ?>
                                                 <th>Milestone Name</th>
-                                                <th width="120" class="text-center">Achievement</th>
+                                                <?php if ($current_role_id == 1) { ?><th width="120" class="text-center">Achievement</th><?php } ?>
                                             </tr>
                                         </thead>
                                         <tbody id="project-details">

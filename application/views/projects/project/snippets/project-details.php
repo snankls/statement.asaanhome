@@ -18,9 +18,10 @@
 	<td>
 		<input type="text" class="form-control required" name="milestone[]" value="<?php echo isset($data->milestone_name) ? @$data->milestone_name : ''; ?>">
 	</td>
+	<?php if ($current_role_id == 1) { ?>
 	<td class="text-center">
-		<!-- Keep it simple with hidden input that gets updated by checkbox -->
 		<input type="hidden" name="achievement[]" value="<?php echo !empty($data->achievement) ? '1' : '0'; ?>" class="achievement-value">
 		<input type="checkbox" class="achievement-checkbox" value="1" <?= (!empty($data->achievement)) ? 'checked' : '' ?>>
 	</td>
+	<?php } ?>
 </tr>
