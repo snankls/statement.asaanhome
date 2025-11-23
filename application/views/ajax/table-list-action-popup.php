@@ -1,0 +1,2 @@
+<button type="button" class="btn btn-warning btn-small" title="Log" onClick="return show_log_history('{log_table}', '{log_id}');"><i class="fa fa-history"></i></button>&ensp;
+<button type="button" class="btn btn-primary btn-small" title="Edit" onClick="edit_record(this);"><i class="fa fa-edit"></i></button>

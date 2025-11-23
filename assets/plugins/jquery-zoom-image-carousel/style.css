@@ -1,0 +1,79 @@
+.jquery-zoom-image-carousel *{
+	margin: 0;
+	padding: 0;
+	z-index: 9999;
+	box-sizing: border-box;
+}
+
+.jquery-zoom-image-carousel .show {
+	width: 250px;
+	height: 250px;
+	text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.jquery-zoom-image-carousel .small-img {
+	width: 260px;
+	height: 70px;
+	margin-top: 10px;
+	position: relative;
+	left: -3px;
+}
+
+.jquery-zoom-image-carousel .small-img .icon-left, .small-img .icon-right {
+	width: 12px;
+	height: 24px;
+	cursor: pointer;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	margin: auto 0;
+}
+
+.jquery-zoom-image-carousel .small-img .icon-left { transform: rotate(180deg) }
+
+.jquery-zoom-image-carousel .small-img .icon-right { right: 0; }
+
+.jquery-zoom-image-carousel .small-img .icon-left:hover, .small-img .icon-right:hover { opacity: .5; }
+
+.jquery-zoom-image-carousel .small-container {
+	width: 223px;
+	height: 70px;
+	overflow: hidden;
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+}
+
+.jquery-zoom-image-carousel .small-container div {
+	width: 800%;
+	position: relative;
+}
+
+.jquery-zoom-image-carousel .small-container .show-small-img {
+	max-width: 70px;
+	max-height: 70px;
+	margin-right: 6px;
+	cursor: pointer;
+	float: left;
+}
+
+.jquery-zoom-image-carousel .small-container .show-small-img:last-of-type { margin-right: 0; }
+
+.jquery-zoom-image-carousel i.image_zoomer {
+	position: absolute;
+	left: 0px;
+	color: #FFFFFE;
+	font-size: 20px;
+	top: 0px;
+	cursor: pointer;
+	background: #000000;
+	padding: 5px;
+	z-index: 99999;
+}
+
+.lightbox_other_images .lightbox-image{
+	display: none;
+}
