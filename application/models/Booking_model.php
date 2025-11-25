@@ -142,6 +142,21 @@
 		return array();
 	}
 	
+	// function booking_challan_list($slug_url)
+	// {
+	// 	$this->db->select('*');
+	// 	$this->db->from('challans');
+	// 	$this->db->where('challans.booking_id', $slug_url);
+		
+	// 	$query = $this->db->get();
+	// 	print_r($this->db->last_query());
+	// 	if($query->num_rows()>0)
+	// 	{
+	// 		return $query->result();
+	// 	}
+	// 	return array();
+	// }
+
 	function booking_challan_list($slug_url)
 	{
 		$this->db->select('*');
@@ -149,9 +164,10 @@
 		$this->db->where('challans.booking_id', $slug_url);
 		
 		$query = $this->db->get();
+		
 		if($query->num_rows()>0)
 		{
-			return $query->result();
+			return $query->result_array(); // Return as array
 		}
 		return array();
 	}

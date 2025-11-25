@@ -57,7 +57,20 @@ function property_types($return_index = false)
 		'8' => 'Kiosk',
 		'9' => 'Townhouse',
         '10' => 'Hotel Room',
+        '11' => 'Foodcourt',
+        '12' => 'Foodcourt Kiosk',
+        '13' => 'Clinic',
+        '14' => 'Laboratory',
+        '15' => 'Pharmacy',
+        '16' => 'Hospital Room',
+        '17' => 'Hotel Apartment',
+        '18' => 'Co-working Space',
 	);
+
+    // Natural sort case-insensitive
+    uasort($data, function($a, $b) {
+        return strcasecmp($a, $b);
+    });
 
 	if($return_index !== false)
 		return isset($data[$return_index]) ? $data[$return_index] : '';
@@ -96,6 +109,11 @@ function relation($return_index = false)
 		'8' => 'Son',
 		'9' => 'Daughter',
 	);
+
+    // Natural sort case-insensitive
+    uasort($data, function($a, $b) {
+        return strcasecmp($a, $b);
+    });
 
 	if($return_index !== false)
 		return isset($data[$return_index]) ? $data[$return_index] : '';

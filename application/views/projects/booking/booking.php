@@ -55,38 +55,6 @@
 							</table>
 						</div>
 					</div>
-					<!-- <div id="list">
-                        <div class="table-responsive">
-                            <table id="dt-table" class="table table-striped table-hover page_data_table">
-                                <thead>
-                                    <tr class="header_columns">
-                                        <th class="no-sort no-search" data-data="counter" style="min-width: 20px; max-width: 20px; text-align:center;">#</th>
-                                        <th data-data="project_name" width="100">Project Name</th>
-                                        <th class="no-search" data-data="property_type">Property Type</th>
-                                        <th data-data="booking_unit">Unit #</th>
-                                        <th data-data="registration">Registration</th>
-                                        <th data-data="customer_name" width="100">Customer Name</th>
-                                        <th data-data="total_price">Total Amount</th>
-                                        <th class="no-search" data-data="book_amount">Booking Amount</th>
-                                        <th class="no-search" data-data="due_amount">Due Amount</th>
-                                        <th class="no-search" data-data="paid_amount">Paid Amount</th>
-                                        <th class="no-search" data-data="overdue_amount">Overdue Amount</th>
-                                        <th class="no-search" data-data="mobile">Mobile</th>
-                                        <th data-data="landline">Landline</th>
-                                        <th data-data="cnic">CNIC</th>
-                                        <th data-data="agency_name" width="100">Agency Name</th>
-                                        <th class="no-search" data-data="future_amount">Future Amount</th>
-                                        <th data-data="agency_commission">Agency Commission</th>
-                                        <th class="no-search" data-data="create_date">Created By</th>
-                                        <th class="fixed_column no-search" data-data="actions" style="min-width: 110px; max-width: 110px; position: relative;">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
-                        </div>
-					</div> -->
 				</div>
 			</div>
 		</div>

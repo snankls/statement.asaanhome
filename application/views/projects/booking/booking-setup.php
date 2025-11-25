@@ -155,7 +155,7 @@ $slug_url = $this->uri->segment($last); ?>
                                     <input type="number" name="agency_commission" class="form-control" value="<?php echo @$record->agency_commission; ?>">
                                 </div>
                                 
-                                 <?php if ($slug_url == 'add') { ?>
+                                <?php if ($slug_url == 'add') { ?>
                                 <div class="col-12"><h4 class="border-bottom"><span class="fa fa-cog"></span> Booking Amount</h4></div>
                                 <div class="form-group col-lg-3 col-xs-12">
                                     <label class="col-form-label">Date</label>

@@ -48,46 +48,22 @@ class Booking extends CI_Controller {
 				'type' => 'left outer'
 			),
 		);
+	
 		$table_columns = "
 			$db_table.*,
 			(
-				CASE 
-					WHEN inventories.plan_type = 'Installment' THEN 
-						( SELECT ii.amount 
-						FROM inventory_installments ii 
-						WHERE ii.inventory_id = bookings.inventory_id 
-						ORDER BY ii.installment_id ASC 
-						LIMIT 1 
-						)
-					WHEN inventories.plan_type = 'Milestone' THEN 
-						( SELECT im.amount 
-						FROM inventory_milestones im 
-						WHERE im.inventory_id = bookings.inventory_id 
-						ORDER BY im.inventory_id ASC 
-						LIMIT 1 
-						)
-					ELSE 0 
-				END
+				SELECT bii.amount
+				FROM inventory_installments bii
+				WHERE bii.inventory_id = bookings.inventory_id
+				ORDER BY bii.inventory_id ASC
+				LIMIT 1
 			) AS first_booking_amount,
 			(
-				CASE 
-					WHEN inventories.plan_type = 'Installment' THEN 
-						( SELECT SUM(ii.amount) 
-						FROM inventory_installments ii 
-						WHERE ii.inventory_id = bookings.inventory_id 
-							AND ii.date <= CURDATE() 
-						)
-
-					WHEN inventories.plan_type = 'Milestone' THEN 
-						( SELECT SUM(im.amount)
-						FROM inventory_milestones im
-						LEFT JOIN project_details pd 
-								ON pd.project_id = im.project_milestone_id
-						WHERE im.inventory_id = bookings.inventory_id
-						)
-					ELSE 0 
-				END
-			) AS due_amount,
+				SELECT SUM(ii.amount)
+				FROM inventory_installments ii
+				WHERE ii.inventory_id = bookings.inventory_id
+				AND ii.date <= CURDATE()
+			) as due_amount,
 			(
 				SELECT SUM(ba.amount)
 				FROM booking_amounts ba

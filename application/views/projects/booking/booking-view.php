@@ -1,5 +1,4 @@
-<?php //pre_print($statement_rows);
-$total_duesurcharge_amount = 0;
+<?php $total_duesurcharge_amount = 0;
 foreach ($duesurcharge_list as $data) {
     $total_duesurcharge_amount += $data->amount;
 } ?>
@@ -190,22 +189,22 @@ foreach ($duesurcharge_list as $data) {
 											$total_amount = 0;
 											$len = count($challan_list);
 											foreach($challan_list as $data) :
-												$total_amount += $data->challan_amount; ?>
+												$total_amount += $data['challan_amount']; ?>
 											<tr>
-                                            	<td><?php echo $i; ?><input type="hidden" name="serial_id" value="<?php echo $data->serial; ?>" /></td>
-												<td><?php echo document_number(array('db_table' => 'booking_amounts', 'document_number' => $data->serial, 'prefix' => '&nbsp;')); ?></td>
-												<td><?php echo get_date_string_sql($data->challan_date); ?></td>
-												<td><?php echo number_format($data->challan_amount); ?></td>
-												<td><?php echo payment_method($data->challan_payment_method); ?><input type="hidden" name="payment_method" value="<?php echo $data->challan_payment_method; ?>" /></td>
-												<td><?php echo $data->reference; ?></td>
-                                                <td><div class="proof-img"><a href="<?php echo get_image_url($data->proof_image, 'booking_receipt'); ?>" class="lightbox-image"><?php echo get_image($data->proof_image, 'booking_receipt'); ?></a></div></td>
+                                            	<td><?php echo $i; ?><input type="hidden" name="serial_id" value="<?php echo $data['serial']; ?>" /></td>
+												<td><?php echo document_number(array('db_table' => 'booking_amounts', 'document_number' => $data['serial'], 'prefix' => '&nbsp;')); ?></td>
+												<td><?php echo get_date_string_sql($data['challan_date']); ?></td>
+												<td><?php echo number_format($data['challan_amount']); ?></td>
+												<td><?php echo payment_method($data['challan_payment_method']); ?><input type="hidden" name="payment_method" value="<?php echo $data['challan_payment_method']; ?>" /></td>
+												<td><?php echo $data['reference']; ?></td>
+                                                <td><div class="proof-img"><a href="<?php echo get_image_url($data['proof_image'], 'booking_receipt'); ?>" class="lightbox-image"><?php echo get_image($data['proof_image'], 'booking_receipt'); ?></a></div></td>
 												
                                                 <?php if ($current_role_id != 6) { ?>
                                                 <td align="center">
-                                                	<button type="button" class="btn btn-dark btn-small" title="Receipt" onClick="challan_receipt('<?php echo $data->challan_id; ?>');"><i class="fa fa-file-text-o"></i></button>
+                                                	<button type="button" class="btn btn-dark btn-small" title="Receipt" onClick="challan_receipt('<?php echo $data['challan_id']; ?>');"><i class="fa fa-file-text-o"></i></button>
                                                     <button type="button" class="btn btn-primary waves-effect waves-light btn-small" data-toggle="modal" onclick="installment_edit_record(this);"><i class="fa fa-edit"></i></button>
                                                     <?php if ($i == $len) { ?>
-                                                    <button type="button" class="btn btn-danger btn-small" title="Delete" onClick="challan_receipt_delete('<?php echo $data->serial; ?>');"><i class="fa fa-times"></i></button>
+                                                    <button type="button" class="btn btn-danger btn-small" title="Delete" onClick="challan_receipt_delete('<?php echo $data['serial']; ?>');"><i class="fa fa-times"></i></button>
                                                     <?php } ?>
                                                 </td>
                                                 <?php } ?>

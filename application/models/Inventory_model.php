@@ -64,6 +64,16 @@
         
         return '';
 	}
+	
+    function get_inventory_plan_type($inventory_id)
+	{
+		$this->db->select('plan_type');
+		$this->db->from('inventories');
+		$this->db->where('inventories.inventory_id', $inventory_id);
+		
+		$query = $this->db->get();
+        $row = $query->row();
+	}
 
 	public function get_where($table, $where = array(), $return_type = 'object', $limit = null, $offset = null, $order_by = null, $order = 'ASC') {
         // Select all columns by default

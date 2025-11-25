@@ -253,13 +253,16 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
     $today = date('Y-m-d');
 
     foreach ($milestones as $i => $m) {
-        $due_date = $m->achievement ? $m->achievement_date : '-';
-        $due_amount = $m->amount;
+        // Convert milestone to array if it's an object
+        $milestone = is_array($m) ? $m : (array)$m;
+        
+        $due_date = $milestone['achievement'] ? $milestone['achievement_date'] : '-';
+        $due_amount = $milestone['amount'];
         $paid_amount_so_far = 0;
         $first_row_done = false;
 
         // Milestone NOT achieved (no due date)
-        if ($m->achievement != 1) {
+        if ($milestone['achievement'] != 1) {
             $payment_exists = false;
             
             // Check if any payments exist for current payment index
@@ -269,7 +272,7 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
 
             if (!$payment_exists) {
                 $statement_rows[] = [
-                    'month'        => $m->milestone_name,
+                    'month'        => $milestone['milestone_name'],
                     'due_date'     => '-',
                     'due_amount'   => $due_amount,
                     'paid_date'    => '-',
@@ -288,12 +291,16 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
         // PROCESS PAYMENTS FOR THIS MILESTONE
         while ($paid_amount_so_far < $due_amount && $payment_index < $payment_count) {
             $current_payment = $payments[$payment_index];
-            $payment_amount_available = $current_payment->challan_amount;
+            
+            // Convert payment to array if it's an object
+            $payment = is_array($current_payment) ? $current_payment : (array)$current_payment;
+            
+            $payment_amount_available = $payment['challan_amount'];
             
             $remaining_due = $due_amount - $paid_amount_so_far;
             $pay_this_round = min($remaining_due, $payment_amount_available);
 
-            $payment_date = $current_payment->challan_date;
+            $payment_date = $payment['challan_date'];
             $daysDifference = ($due_date && strtotime($payment_date) > strtotime($due_date)) 
                 ? max(0, floor((strtotime($payment_date) - strtotime($due_date)) / 86400))
                 : 0;
@@ -301,15 +308,15 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
             $surcharge_amount = 0; // Your surcharge logic commented out
 
             $statement_rows[] = [
-                'month'        => !$first_row_done ? $m->milestone_name : '',
+                'month'        => !$first_row_done ? $milestone['milestone_name'] : '',
                 'due_date'     => !$first_row_done && $due_date ? get_date_string_sql($due_date) : '',
                 'due_amount'   => !$first_row_done ? $due_amount : $remaining_due,
                 'paid_date'    => get_date_string_sql($payment_date),
                 'paid_amount'  => $pay_this_round,
-                'serial'       => '&nbsp;' . str_pad($current_payment->serial, 6, '0', STR_PAD_LEFT),
+                'serial'       => '&nbsp;' . str_pad($payment['serial'], 6, '0', STR_PAD_LEFT),
                 'balance'      => $remaining_due - $pay_this_round,
-                'payment_mode' => payment_method($current_payment->challan_payment_method),
-                'reference'    => $current_payment->reference,
+                'payment_mode' => payment_method($payment['challan_payment_method']),
+                'reference'    => $payment['reference'],
                 'surcharge'    => $surcharge_amount
             ];
 
@@ -319,10 +326,10 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
             $paid_amount_so_far += $pay_this_round;
 
             // Reduce the current payment's available amount
-            $payments[$payment_index]->challan_amount -= $pay_this_round;
+            $payments[$payment_index]['challan_amount'] = $payment_amount_available - $pay_this_round;
 
             // If current payment is fully used, move to next payment
-            if ($payments[$payment_index]->challan_amount <= 0) {
+            if ($payments[$payment_index]['challan_amount'] <= 0) {
                 $payment_index++;
             }
 
@@ -341,7 +348,7 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
             $surcharge_unpaid = 0; // Your surcharge logic commented out
 
             $statement_rows[] = [
-                'month'        => !$first_row_done ? $m->milestone_name : '',
+                'month'        => !$first_row_done ? $milestone['milestone_name'] : '',
                 'due_date'     => !$first_row_done && $due_date ? get_date_string_sql($due_date) : '',
                 'due_amount'   => !$first_row_done ? $due_amount : $remaining,
                 'paid_date'    => '-',
@@ -359,7 +366,7 @@ function generate_milestone_statement_data($milestones, $payments, $total_unit_p
         // Future milestone with no payments
         elseif (!$first_row_done) {
             $statement_rows[] = [
-                'month'        => $m->milestone_name,
+                'month'        => $milestone['milestone_name'],
                 'due_date'     => $due_date ? get_date_string_sql($due_date) : '-',
                 'due_amount'   => $due_amount,
                 'paid_date'    => '-',

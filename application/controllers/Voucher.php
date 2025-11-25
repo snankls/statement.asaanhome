@@ -48,7 +48,7 @@ class Voucher extends CI_Controller {
 		$table_count = "COUNT(DISTINCT $db_table.$primary_id) as total_count";
 		
 		//Where Condition
-		if($current_role_id == 2) {
+		if($current_role_id == 2 or $current_role_id == 6) {
 			$project_ids = explode(',', $session_project_id);
 			$conditions[] = array('operator' => 'WHERE_IN', 'column' => "$db_table.project_id", 'value' => $project_ids);
 		}
@@ -67,7 +67,12 @@ class Voucher extends CI_Controller {
 			$table_data['data'][$index]->counter = $counter;
 			$table_data['data'][$index]->DT_RowId = $rec->voucher_id;
 			$table_data['data'][$index]->checkbox = '<i class="fa fa-square-o"></i>';
-			$table_data['data'][$index]->transaction_type = transaction_type($rec->transaction_type).'<div class="table-action"><a href="'.site_url('voucher/edit/'.$rec->voucher_id).'">Edit</a> | <a href="'.site_url('voucher/view/'.$rec->voucher_id).'">View</a> | <a href="javascript:;" onClick="delete_record('.$rec->voucher_id.');">Delete</a></div>';
+			$table_data['data'][$index]->transaction_type = transaction_type($rec->transaction_type);
+			if ($current_role_id == 6) {
+				$table_data['data'][$index]->transaction_type .= '<div class="table-action"><a href="'.site_url('voucher/view/'.$rec->voucher_id).'">View</a></div>';
+			} else {
+				$table_data['data'][$index]->transaction_type .= '<div class="table-action"><a href="'.site_url('voucher/edit/'.$rec->voucher_id).'">Edit</a> | <a href="'.site_url('voucher/view/'.$rec->voucher_id).'">View</a> | <a href="javascript:;" onClick="delete_record('.$rec->voucher_id.');">Delete</a></div>';
+			}
 			$table_data['data'][$index]->create_date = $rec->user_name." <br /> ".date_only($rec->create_date);
 		}
 		
