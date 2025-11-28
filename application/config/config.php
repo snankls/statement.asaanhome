@@ -26,7 +26,7 @@ date_default_timezone_set('Asia/Karachi');
 
 //ToDo: update url before making live
 if ( ENVIRONMENT == 'development' ){
-	$config['base_url'] = "http://".$_SERVER['HTTP_HOST']."/asaanhome/testing/";
+	$config['base_url'] = "http://".$_SERVER['HTTP_HOST']."/asaanhome/statement/";
 }else{
 	$config['base_url']	= "https://".$_SERVER['HTTP_HOST'];
 }

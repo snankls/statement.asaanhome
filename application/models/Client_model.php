@@ -6,14 +6,16 @@
         parent::__construct();				
     }
 	
-	function project_detail_list($slug_url)
+	function get_user_statement($registration, $cnic)
 	{
-		$this->db->select('*, projects.created_on as project_create_date');
-		$this->db->from('projects');
-		$this->db->where('projects.project_id', $slug_url);
+		$this->db->select('booking_id, registration, cnic');
+		$this->db->from('bookings');
+		$this->db->where('registration', $registration);
+		$this->db->where('cnic', $cnic);
 		
 		$query = $this->db->get();
 		return $query->row();
 	}
+
 }
 ?>

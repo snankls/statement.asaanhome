@@ -113,118 +113,124 @@ function flatten_hierarchy($accounts, &$result, $level = 0)
     }
 }
 
+// Installment
 function generate_statement_data($installments, $payments, $total_unit_price)
 {
-    $statement_rows = [];
-    $total_due = 0;
-    $total_paid = 0;
-    $total_balance = 0;
-    $total_surcharge = 0;
+    $statement_rows   = [];
+    $total_due        = 0;
+    $total_paid       = 0;
+    $total_balance    = 0;
+    $total_surcharge  = 0;
 
-    $payment_index = 0;
-    $payment_balance = isset($payments[$payment_index]) ? $payments[$payment_index]->challan_amount : 0;
+    // Normalize payments as array of arrays
+    $payments = array_map(function($p) {
+        return (array)$p;
+    }, $payments);
+
+    $payment_index  = 0;
+    $payment_count  = count($payments);
+    $payment_balance = ($payment_count > 0) ? $payments[0]['challan_amount'] : 0;
 
     $today = date('Y-m-d');
 
-    foreach ($installments as $i => $installment) {
-        $due_date = $installment->date;
-        $due_amount = $installment->amount;
+    foreach ($installments as $i => $inst)
+    {
+        $due_date = $inst->date;
+        $due_amount = $inst->amount;
+
         $paid_amount_so_far = 0;
         $first_row_done = false;
 
-        // Handle zero-amount installment rows
+        // Zero Installments
         if ($due_amount == 0) {
             $statement_rows[] = [
-                'month' => ($i + 1),
-                'due_date' => get_date_string_sql($due_date),
-                'due_amount' => 0,
-                'paid_date' => '-',
-                'paid_amount' => '-',
-                'serial' => '-',
-                'balance' => '-',
+                'month'        => ($i + 1),
+                'due_date'     => get_date_string_sql($due_date),
+                'due_amount'   => 0,
+                'paid_date'    => '-',
+                'paid_amount'  => '-',
+                'serial'       => '-',
+                'balance'      => '-',
                 'payment_mode' => '-',
-                'reference' => '-',
-                'surcharge' => 0
+                'reference'    => '-',
+                'surcharge'    => 0
             ];
             continue;
         }
 
-        // Process payments for this installment
-        while ($paid_amount_so_far < $due_amount && isset($payments[$payment_index])) {
+        // -------- PROCESS PAYMENTS FOR THIS INSTALLMENT ----------
+        while ($paid_amount_so_far < $due_amount && $payment_index < $payment_count)
+        {
+            $payment = $payments[$payment_index];
+
+            // Ensure all required keys exist
+            $payment['challan_amount']           = $payment['challan_amount'] ?? 0;
+            $payment['challan_date']             = $payment['challan_date'] ?? $today;
+            $payment['serial']                   = $payment['serial'] ?? '';
+            $payment['challan_payment_method']   = $payment['challan_payment_method'] ?? '';
+            $payment['reference']                = $payment['reference'] ?? '';
+
             $remaining_due = $due_amount - $paid_amount_so_far;
             $pay_this_round = min($remaining_due, $payment_balance);
-            $current_payment = $payments[$payment_index];
 
-            $payment_date = !empty($current_payment->challan_date) ? $current_payment->challan_date : $today;
-            $daysDifference = max(0, floor((strtotime($payment_date) - strtotime($due_date)) / 86400));
+            // Surcharge logic
+            $daysDifference = max(0, floor((strtotime($payment['challan_date']) - strtotime($due_date)) / 86400));
             $surcharge_amount = ($daysDifference > 0 && $remaining_due > 0)
                 ? round($remaining_due * 0.001 * $daysDifference)
                 : 0;
 
-            $row = [
-                'month' => !$first_row_done ? ($i + 1) : '',
-                'due_date' => !$first_row_done ? get_date_string_sql($due_date) : '',
-                'due_amount' => !$first_row_done ? $due_amount : $remaining_due,
-                'paid_date' => get_date_string_sql($payment_date),
-                'paid_amount' => $pay_this_round,
-                'serial' => '&nbsp;' . str_pad($current_payment->serial, 6, '0', STR_PAD_LEFT),
-                'balance' => $remaining_due - $pay_this_round,
-                'payment_mode' => payment_method($current_payment->challan_payment_method),
-                'reference' => $current_payment->reference,
-                'surcharge' => $surcharge_amount
+            // Create row
+            $statement_rows[] = [
+                'month'        => !$first_row_done ? ($i + 1) : '',
+                'due_date'     => !$first_row_done ? get_date_string_sql($due_date) : '',
+                'due_amount'   => !$first_row_done ? $due_amount : $remaining_due,
+                'paid_date'    => get_date_string_sql($payment['challan_date']),
+                'paid_amount'  => $pay_this_round,
+                'serial'       => '&nbsp;' . str_pad($payment['serial'], 6, '0', STR_PAD_LEFT),
+                'balance'      => $remaining_due - $pay_this_round,
+                'payment_mode' => payment_method($payment['challan_payment_method']),
+                'reference'    => $payment['reference'],
+                'surcharge'    => $surcharge_amount
             ];
-            $statement_rows[] = $row;
 
-            $total_paid += $pay_this_round;
+            // Update totals
+            $total_paid      += $pay_this_round;
             $total_surcharge += $surcharge_amount;
-
             $paid_amount_so_far += $pay_this_round;
             $payment_balance -= $pay_this_round;
+
             $first_row_done = true;
 
+            // Move to next payment
             if ($payment_balance <= 0) {
                 $payment_index++;
-                $payment_balance = isset($payments[$payment_index]) ? $payments[$payment_index]->challan_amount : 0;
+                $payment_balance = ($payment_index < $payment_count) ? $payments[$payment_index]['challan_amount'] : 0;
             }
         }
 
-        // If not fully paid → show pending row (only for past/current installments)
-        if ($paid_amount_so_far < $due_amount && strtotime($due_date) <= strtotime($today)) {
+        // -------- PENDING ROW (Unpaid Amount) --------
+        if ($paid_amount_so_far < $due_amount)
+        {
             $remaining = $due_amount - $paid_amount_so_far;
+
             $days_unpaid = max(0, floor((strtotime($today) - strtotime($due_date)) / 86400));
-            $surcharge_unpaid = ($days_unpaid > 0 && $remaining > 0)
-                ? round($remaining * 0.001 * $days_unpaid)
-                : 0;
+            $surcharge_unpaid = ($days_unpaid > 0) ? round($remaining * 0.001 * $days_unpaid) : 0;
 
             $statement_rows[] = [
-                'month' => !$first_row_done ? ($i + 1) : '',
-                'due_date' => !$first_row_done ? get_date_string_sql($due_date) : '',
-                'due_amount' => !$first_row_done ? $due_amount : $remaining,
-                'paid_date' => '-',
-                'paid_amount' => '-',
-                'serial' => '-',
-                'balance' => $remaining,
+                'month'        => !$first_row_done ? ($i + 1) : '',
+                'due_date'     => !$first_row_done ? get_date_string_sql($due_date) : '',
+                'due_amount'   => !$first_row_done ? $due_amount : $remaining,
+                'paid_date'    => '-',
+                'paid_amount'  => '-',
+                'serial'       => '-',
+                'balance'      => $remaining,
                 'payment_mode' => '-',
-                'reference' => '-',
-                'surcharge' => $surcharge_unpaid
+                'reference'    => '-',
+                'surcharge'    => $surcharge_unpaid
             ];
-            $total_surcharge += $surcharge_unpaid;
+
             $total_balance += $remaining;
-        }
-        // For future installments that aren't fully paid, only show if no payments have been made
-        elseif (!$first_row_done && $paid_amount_so_far < $due_amount) {
-            $statement_rows[] = [
-                'month' => ($i + 1),
-                'due_date' => get_date_string_sql($due_date),
-                'due_amount' => $due_amount,
-                'paid_date' => '-',
-                'paid_amount' => '-',
-                'serial' => '-',
-                'balance' => '-',
-                'payment_mode' => '-',
-                'reference' => '-',
-                'surcharge' => 0
-            ];
+            $total_surcharge += $surcharge_unpaid;
         }
 
         $total_due += $due_amount;
@@ -232,13 +238,139 @@ function generate_statement_data($installments, $payments, $total_unit_price)
 
     return [
         'statement_rows' => $statement_rows,
-        'total_due' => $total_due,
-        'total_paid' => $total_paid,
-        'total_balance' => $total_balance,
+        'total_due'      => $total_due,
+        'total_paid'     => $total_paid,
+        'total_balance'  => $total_balance,
         'total_surcharge'=> $total_surcharge,
     ];
 }
+// function generate_statement_data($installments, $payments, $total_unit_price)
+// {
+//     $statement_rows = [];
+//     $total_due = 0;
+//     $total_paid = 0;
+//     $total_balance = 0;
+//     $total_surcharge = 0;
 
+//     $payment_index = 0;
+//     $payment_balance = isset($payments[$payment_index]) ? $payments[$payment_index]->challan_amount : 0;
+
+//     $today = date('Y-m-d');
+
+//     foreach ($installments as $i => $installment) {
+//         $due_date = $installment->date;
+//         $due_amount = $installment->amount;
+//         $paid_amount_so_far = 0;
+//         $first_row_done = false;
+
+//         // Handle zero-amount installment rows
+//         if ($due_amount == 0) {
+//             $statement_rows[] = [
+//                 'month' => ($i + 1),
+//                 'due_date' => get_date_string_sql($due_date),
+//                 'due_amount' => 0,
+//                 'paid_date' => '-',
+//                 'paid_amount' => '-',
+//                 'serial' => '-',
+//                 'balance' => '-',
+//                 'payment_mode' => '-',
+//                 'reference' => '-',
+//                 'surcharge' => 0
+//             ];
+//             continue;
+//         }
+
+//         // Process payments for this installment
+//         while ($paid_amount_so_far < $due_amount && isset($payments[$payment_index])) {
+//             $remaining_due = $due_amount - $paid_amount_so_far;
+//             $pay_this_round = min($remaining_due, $payment_balance);
+//             $current_payment = $payments[$payment_index];
+
+//             $payment_date = !empty($current_payment->challan_date) ? $current_payment->challan_date : $today;
+//             $daysDifference = max(0, floor((strtotime($payment_date) - strtotime($due_date)) / 86400));
+//             $surcharge_amount = ($daysDifference > 0 && $remaining_due > 0)
+//                 ? round($remaining_due * 0.001 * $daysDifference)
+//                 : 0;
+
+//             $row = [
+//                 'month' => !$first_row_done ? ($i + 1) : '',
+//                 'due_date' => !$first_row_done ? get_date_string_sql($due_date) : '',
+//                 'due_amount' => !$first_row_done ? $due_amount : $remaining_due,
+//                 'paid_date' => get_date_string_sql($payment_date),
+//                 'paid_amount' => $pay_this_round,
+//                 'serial' => '&nbsp;' . str_pad($current_payment->serial, 6, '0', STR_PAD_LEFT),
+//                 'balance' => $remaining_due - $pay_this_round,
+//                 'payment_mode' => payment_method($current_payment->challan_payment_method),
+//                 'reference' => $current_payment->reference,
+//                 'surcharge' => $surcharge_amount
+//             ];
+//             $statement_rows[] = $row;
+
+//             $total_paid += $pay_this_round;
+//             $total_surcharge += $surcharge_amount;
+
+//             $paid_amount_so_far += $pay_this_round;
+//             $payment_balance -= $pay_this_round;
+//             $first_row_done = true;
+
+//             if ($payment_balance <= 0) {
+//                 $payment_index++;
+//                 $payment_balance = isset($payments[$payment_index]) ? $payments[$payment_index]->challan_amount : 0;
+//             }
+//         }
+
+//         // If not fully paid → show pending row (only for past/current installments)
+//         if ($paid_amount_so_far < $due_amount && strtotime($due_date) <= strtotime($today)) {
+//             $remaining = $due_amount - $paid_amount_so_far;
+//             $days_unpaid = max(0, floor((strtotime($today) - strtotime($due_date)) / 86400));
+//             $surcharge_unpaid = ($days_unpaid > 0 && $remaining > 0)
+//                 ? round($remaining * 0.001 * $days_unpaid)
+//                 : 0;
+
+//             $statement_rows[] = [
+//                 'month' => !$first_row_done ? ($i + 1) : '',
+//                 'due_date' => !$first_row_done ? get_date_string_sql($due_date) : '',
+//                 'due_amount' => !$first_row_done ? $due_amount : $remaining,
+//                 'paid_date' => '-',
+//                 'paid_amount' => '-',
+//                 'serial' => '-',
+//                 'balance' => $remaining,
+//                 'payment_mode' => '-',
+//                 'reference' => '-',
+//                 'surcharge' => $surcharge_unpaid
+//             ];
+//             $total_surcharge += $surcharge_unpaid;
+//             $total_balance += $remaining;
+//         }
+//         // For future installments that aren't fully paid, only show if no payments have been made
+//         elseif (!$first_row_done && $paid_amount_so_far < $due_amount) {
+//             $statement_rows[] = [
+//                 'month' => ($i + 1),
+//                 'due_date' => get_date_string_sql($due_date),
+//                 'due_amount' => $due_amount,
+//                 'paid_date' => '-',
+//                 'paid_amount' => '-',
+//                 'serial' => '-',
+//                 'balance' => '-',
+//                 'payment_mode' => '-',
+//                 'reference' => '-',
+//                 'surcharge' => 0
+//             ];
+//         }
+
+//         $total_due += $due_amount;
+//     }
+
+//     return [
+//         'statement_rows' => $statement_rows,
+//         'total_due' => $total_due,
+//         'total_paid' => $total_paid,
+//         'total_balance' => $total_balance,
+//         'total_surcharge'=> $total_surcharge,
+//     ];
+// }
+
+// Milestone
 function generate_milestone_statement_data($milestones, $payments, $total_unit_price)
 {
     $statement_rows = [];

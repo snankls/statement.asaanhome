@@ -823,8 +823,7 @@ function email_send($subject, $email) {
 }
 
 function copyrights() {
-	$data = "Copyright &copy; 2024 All rights reserved.";
-	return $data;
+	return "Copyright &copy; " . date('Y') . " All rights reserved.";
 }
 
 function pre_print($array_data) {

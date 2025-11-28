@@ -38,13 +38,14 @@ function loader_tiny() {
 <!-- jQuery  -->
 <script src="<?php echo site_url('assets/js/modernizr.min.js'); ?>"></script>
 <script src="<?php echo site_url('assets/js/jquery.js'); ?>"></script>
+<script src="<?php echo site_url('assets/js/masking.js'); ?>"></script>
 
 </head>
 <body<?php if(!empty($body_class)) echo ' class="'.$body_class.'"'; ?>>
 
 <!-- Begin page -->
 <div id="wrapper">
+	
 	<!--Header-->
-    
     <div class="">
         
