@@ -135,7 +135,7 @@
 <script>
 //Account Statement
 function account_statement(update_id, booking_inventory_id) {
-    const url = site_url + "pdf/account_statement?booking_id=" + update_id + "&inventory_id=" + booking_inventory_id;
+    const url = site_url + "client/account_statement?booking_id=" + update_id + "&inventory_id=" + booking_inventory_id;
     window.open(url, '_blank');
 }
 </script>
